@@ -36,16 +36,22 @@ def download(url, dst, name):
 
 print("输入抖音链接：")
 douyin_url = input()
-#获取抖音视频链接，此处未做链接的校验功能
-headers = {'User-Agnet': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36', 'Connection': 'keep-alive'}
-# Requests 的请求头部，可以根据需求修改
-html_r = requests.get(douyin_url,headers=headers)
+Headers = {
+			'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+			'accept-encoding': 'gzip, deflate, br',
+			'accept-language': 'zh-CN,zh;q=0.9',
+			'cache-control': 'max-age=0',
+			'upgrade-insecure-requests': '1',
+			'user-agent': 'Mozilla/5.0 (Linux; U; Android 5.1.1; zh-cn; MI 4S Build/LMY47V) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.146 Mobile Safari/537.36 XiaoMi/MiuiBrowser/9.1.3',
+		}
+html_r = requests.get(douyin_url,headers = Headers)
 html_data = html_r.text
 #使用 Requests 获得抖音分享页面的网页源代码
-video_id = re.findall("(?<=video_id=).+?(?=\\\\u0026line=0)",html_data)[0]
+video_id = re.findall("(?<=video_id=).+?(?=&amp)",html_data)[0]
 #在网页源代码中使用正则获得视频的 video_id
-video_name = re.findall("(?<=class=\"desc\">).+?(?=</p>)",html_data)[0] + " " + re.findall("(?<=崇拜).+?(?=，从)",html_data)[0]
-#在网页源代码中使用正则匹配并拼接视频的 video_name ，video_name 参数用于下载时显示文件名，此处video_name 格式：视频名+@用户名
+title_name = re.findall("(?<=desc\">).+?(?=</p>)",html_data)[0]
+nick_name = re.findall("(?<=bottom-user\">).+?(?=</p>)",html_data)[0]
+video_name = nick_name+""+ title_name
 file_name = "./" + video_name + ".mp4"
 #视频文件在本地的存储位置及文件名
 video_download_url = 'https://aweme.snssdk.com/aweme/v1/play/?video_id=' + video_id
